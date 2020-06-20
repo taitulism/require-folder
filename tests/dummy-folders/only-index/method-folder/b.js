@@ -1,0 +1,1 @@
+module.exports = 'ignore-b';
