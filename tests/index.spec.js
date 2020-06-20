@@ -32,7 +32,21 @@ describe('TPL', () => {
 			a: {index: 'aa'},
 			b: 'bbb',
 			c: 'cccc',
+			d: 'd',
 		});
+	});
+
+	it('has name hooks', () => {
+		expect(TPL('./tests/dummy-folders/hooks', {
+			alias: {b: 'bbb'},
+			hooks: {
+				b: (ctxObj, entryMap) => {
+					expect(ctxObj).to.be.an('object');
+					expect(entryMap.name).to.equal('bbb.js');
+					ctxObj.myKey = require(entryMap.path);
+				}
+			}
+		})).to.deep.equal({myKey: 'my-value'});
 	});
 
 	it('deep', () => {
