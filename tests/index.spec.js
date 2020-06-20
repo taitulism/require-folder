@@ -14,10 +14,24 @@ describe('TPL', () => {
 		});
 	});
 
-	it('require js files only', () => {
+	it('prefers the file on duplicates', () => {
 		expect(TPL('./tests/dummy-folders/duplicates')).to.deep.equal({
 			a: 'aaa',
 			b: 'bbb',
+		});
+	});
+
+	it('rename aliases', () => {
+		expect(TPL('./tests/dummy-folders/aliases', {
+			alias: {
+				a: 'aa',
+				b: ['bbb'],
+				c: ['skip', 'cccc']
+			}
+		})).to.deep.equal({
+			a: {index: 'aa'},
+			b: 'bbb',
+			c: 'cccc',
 		});
 	});
 
