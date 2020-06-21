@@ -1,18 +1,17 @@
 const mapFolder = require('map-folder');
 const {FILE, FOLDER} = mapFolder;
-// const TPL = require('./src/TPL');
 
 module.exports = function requireFolder (dirPath, opts = {}) {
-	const dirMap = mapFolder.sync(dirPath, ({type, ext, base}) => {
-		return type === FOLDER || ext === 'js' || base === '_INDEX_ONLY';
-	});
+	const dirMap = mapFolder.sync(dirPath, ({type, ext, base}) => (
+		type === FOLDER || ext === 'js' || base === '_INDEX_ONLY'
+	));
 
 	const alias = createAliasesMap(opts.alias || opts.aliases);
 	const hooks = opts.hooks || {};
 
 	if (dirMap.type === FOLDER) {
 		const obj = {};
-		const entries = dirMap.entries;
+		const {entries} = dirMap;
 
 		if (entries._INDEX_ONLY) return require(dirMap.path);
 
@@ -34,6 +33,7 @@ module.exports = function requireFolder (dirPath, opts = {}) {
 function resolveKey (rawKey, map, aliasMap) {
 	// map.base || key
 	let key;
+
 	if (map.type === FILE) {
 		key = map.base;
 	}
@@ -67,13 +67,13 @@ function createAliasesMap (rawAliases) {
 	return aliases;
 }
 
-const hasOwn = Object.hasOwnProperty;
+const hasOwnProp = Object.hasOwnProperty;
 
 function forIn (obj, fn) {
-	const _hasOwn = hasOwn.bind(obj);
+	const hasOwn = hasOwnProp.bind(obj);
 
-	for (let key in obj) {
-		if (_hasOwn(key)) {
+	for (const key in obj) {
+		if (hasOwn(key)) {
 			fn.call(obj, key, obj[key]);
 		}
 	}

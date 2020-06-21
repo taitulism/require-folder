@@ -1,33 +1,33 @@
 const {expect} = require('chai');
 
-const TPL = require('../');
+const requireFolder = require('../');
 
-describe('TPL', () => {
+describe('requireFolder', () => {
 	it('is a function', () => {
-		expect(TPL).to.be.a('function');
+		expect(requireFolder).to.be.a('function');
 	});
 
 	it('shallow', () => {
-		expect(TPL('./tests/dummy-folders/shallow')).to.deep.equal({
+		expect(requireFolder('./tests/dummy-folders/shallow')).to.deep.equal({
 			a: 'aaa',
 			b: 'bbb',
 		});
 	});
 
 	it('prefers the file on duplicates', () => {
-		expect(TPL('./tests/dummy-folders/duplicates')).to.deep.equal({
+		expect(requireFolder('./tests/dummy-folders/duplicates')).to.deep.equal({
 			a: 'aaa',
 			b: 'bbb',
 		});
 	});
 
 	it('rename aliases', () => {
-		expect(TPL('./tests/dummy-folders/aliases', {
+		expect(requireFolder('./tests/dummy-folders/aliases', {
 			alias: {
 				a: 'aa',
 				b: ['bbb'],
-				c: ['skip', 'cccc']
-			}
+				c: ['skip', 'cccc'],
+			},
 		})).to.deep.equal({
 			a: {index: 'aa'},
 			b: 'bbb',
@@ -37,20 +37,20 @@ describe('TPL', () => {
 	});
 
 	it('has name hooks', () => {
-		expect(TPL('./tests/dummy-folders/hooks', {
+		expect(requireFolder('./tests/dummy-folders/hooks', {
 			alias: {b: 'bbb'},
 			hooks: {
 				b: (ctxObj, entryMap) => {
 					expect(ctxObj).to.be.an('object');
 					expect(entryMap.name).to.equal('bbb.js');
 					ctxObj.myKey = require(entryMap.path);
-				}
-			}
+				},
+			},
 		})).to.deep.equal({myKey: 'my-value'});
 	});
 
 	it('deep', () => {
-		expect(TPL('./tests/dummy-folders/deep')).to.deep.equal({
+		expect(requireFolder('./tests/dummy-folders/deep')).to.deep.equal({
 			a: 'aaa',
 			b: 'bbb',
 			folder: {
@@ -69,7 +69,7 @@ describe('TPL', () => {
 	});
 
 	it('can require index.js only', () => {
-		expect(TPL('./tests/dummy-folders/only-index')).to.deep.equal({
+		expect(requireFolder('./tests/dummy-folders/only-index')).to.deep.equal({
 			a: 'aaa',
 			b: 'bbb',
 			'regular-folder': {
@@ -80,8 +80,4 @@ describe('TPL', () => {
 			'method-folder': 'method-folder-index',
 		});
 	});
-
-
-
-
 });
