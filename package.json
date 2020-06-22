@@ -1,6 +1,6 @@
 {
-   "name": "TPL",
-   "description": "Doing stuff.",
+   "name": "require-folder",
+   "description": "Recursive require all js files in a folder.",
    "version": "0.0.0",
    "license": "MIT",
    "private": true,
