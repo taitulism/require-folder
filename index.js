@@ -8,38 +8,27 @@ module.exports = function requireFolder (dirPath, opts = {}) {
 
 	const alias = createAliasesMap(opts.alias || opts.aliases);
 	const hooks = opts.hooks || {};
+	const {type, entries} = dirMap;
 
-	if (dirMap.type === FOLDER) {
-		const obj = {};
-		const {entries} = dirMap;
+	if (type === FILE || entries._INDEX_ONLY) return require(dirMap.path);
 
-		if (entries._INDEX_ONLY) return require(dirMap.path);
+	const obj = {};
 
-		forIn(entries, (key) => {
-			const map = entries[key];
-			const resolvedKey = resolveKey(key, map, alias);
-			const hookFn = hooks[resolvedKey];
+	forIn(entries, (key) => {
+		const map = entries[key];
+		const resolvedKey = resolveKey(key, map, alias);
+		const hookFn = hooks[resolvedKey];
 
-			if (hookFn) hookFn(obj, map);
-			else obj[resolvedKey] = requireFolder(map.path, opts);
-		});
+		if (hookFn) hookFn(obj, map);
+		else obj[resolvedKey] = requireFolder(map.path, opts);
+	});
 
-		return obj;
-	}
-
-	return require(dirMap.path);
+	return obj;
 };
 
 function resolveKey (rawKey, map, aliasMap) {
 	// map.base || key
-	let key;
-
-	if (map.type === FILE) {
-		key = map.base;
-	}
-	else {
-		key = rawKey;
-	}
+	const key = (map.type === FILE) ? map.base : rawKey;
 
 	if (aliasMap && aliasMap.has(key)) {
 		return aliasMap.get(key);
