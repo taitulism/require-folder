@@ -21,7 +21,7 @@ describe('requireFolder', () => {
 		});
 	});
 
-	it('rename aliases', () => {
+	it('aliases', () => {
 		expect(requireFolder('./tests/dummy-folders/aliases', {
 			alias: {
 				a: 'aa',
@@ -36,7 +36,22 @@ describe('requireFolder', () => {
 		});
 	});
 
-	it('has name hooks', () => {
+	it('groups', () => {
+		expect(requireFolder('./tests/dummy-folders/groups', {
+			groups: {
+				letters: ['a', 'b', 'c'],
+			},
+		})).to.deep.equal({
+			x: 'xx',
+			letters: {
+				a: 'aaa',
+				b: 'bbb',
+				c: 'ccc',
+			},
+		});
+	});
+
+	it('hooks', () => {
 		expect(requireFolder('./tests/dummy-folders/hooks', {
 			alias: {b: 'bbb'},
 			hooks: {
