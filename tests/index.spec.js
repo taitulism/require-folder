@@ -36,6 +36,18 @@ describe('requireFolder', () => {
 		});
 	});
 
+	it('mapKey', () => {
+		expect(requireFolder('./tests/dummy-folders/map-key', {
+			mapKey (rawKey) {
+				return rawKey.toUpperCase();
+			},
+		})).to.deep.equal({
+			A: 'value-a',
+			B: 'value-b',
+			C: 'value-c',
+		});
+	});
+
 	it('groups', () => {
 		expect(requireFolder('./tests/dummy-folders/groups', {
 			groups: {
