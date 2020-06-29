@@ -1,4 +1,6 @@
+const {resolve} = require('path');
 const {expect} = require('chai');
+const {FOLDER} = require('map-folder');
 
 const requireFolder = require('../');
 
@@ -45,6 +47,30 @@ describe('requireFolder', () => {
 			A: 'value-a',
 			B: 'value-b',
 			C: 'value-c',
+		});
+	});
+
+	it('stale', () => {
+		expect(requireFolder('./tests/dummy-folders/stale', {
+			stale: ['public'],
+		})).to.deep.equal({
+			a: 'aaa',
+			public: {
+				_entryMap: {
+					path: resolve(__dirname, 'dummy-folders/stale/public'),
+					type: FOLDER,
+					name: 'public',
+					entries: {
+						'style.css': {
+							base: 'style',
+							ext: 'css',
+							name: 'style.css',
+							path: resolve(__dirname, 'dummy-folders/stale/public/style.css'),
+							type: 1,
+						}
+					}
+				}
+			},
 		});
 	});
 

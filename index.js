@@ -1,9 +1,12 @@
+const {sep} = require('path');
 const mapFolder = require('map-folder');
 const {FILE, FOLDER} = mapFolder;
 
 function requireFolder (dirPath, opts = {}) {
-	const dirMap = mapFolder.sync(dirPath, ({type, ext, base}) => (
-		type === FOLDER || ext === 'js' || base === '_INDEX_ONLY'
+	const staleList = opts.stale || null;
+
+	const dirMap = mapFolder.sync(dirPath, ({type, ext, base, path}) => (
+		type === FOLDER || ext === 'js' || base === '_INDEX_ONLY' || isStale(path, staleList)
 	));
 
 	const aliasesMap = createAliasesMap(opts.alias || opts.aliases);
@@ -19,7 +22,10 @@ function requireFolder (dirPath, opts = {}) {
 		const entryMap = entries[rawKey];
 		const key = resolveKey(rawKey, entryMap, aliasesMap, opts.mapKey);
 
-		if (groupsMap && groupsMap.has(key)) {
+		if (staleList && isStale(entryMap.path, staleList)) {
+			obj[key] = {_entryMap: entryMap};
+		}
+		else if (groupsMap && groupsMap.has(key)) {
 			const groupName = groupsMap.get(key);
 
 			obj[groupName] = obj[groupName] || Object.create(null);
@@ -38,7 +44,7 @@ function requireFolder (dirPath, opts = {}) {
 
 module.exports = requireFolder;
 
-function resolveKey (rawKey, map, aliasMap, mapKey) {
+function resolveKey (rawKey, map, aliasMap, keyMapper) {
 	// map.base || key
 	const key = (map.type === FILE) ? map.base : rawKey;
 
@@ -46,7 +52,7 @@ function resolveKey (rawKey, map, aliasMap, mapKey) {
 		return aliasMap.get(key);
 	}
 
-	return typeof mapKey == 'function' ? mapKey(key) : key;
+	return typeof keyMapper == 'function' ? keyMapper(key) : key;
 }
 
 function createAliasesMap (rawAliases) {
@@ -73,6 +79,8 @@ function createGroupsMap (rawGroups) {
 	aliases = {
 		nba: ['NBA', 'N.B.A.']
 	}
+
+	Becomes:
 
 	aliasesMap = {
 		'NBA'  : 'nba',
@@ -104,6 +112,23 @@ function forIn (obj, fn) {
 	for (const key in obj) {
 		if (hasOwn(key)) {
 			fn.call(obj, key, obj[key]);
+		}
+	}
+}
+
+function isStale (entryPath, staleList) {
+	if (!staleList) return false;
+	const staleLen = staleList.length;
+
+	for (let i = 0; i < staleLen; i++) {
+		const staleName = staleList[i];
+		const pathSplit = entryPath.split(sep);
+		const pathSegmentsLen = pathSplit.length;
+
+		for (let j = 0; j < pathSegmentsLen; j++) {
+			const segment = pathSplit[j];
+
+			if (segment === staleName) return true;
 		}
 	}
 }
