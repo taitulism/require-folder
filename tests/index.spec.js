@@ -50,14 +50,14 @@ describe('requireFolder', () => {
 		});
 	});
 
-	it('stale', () => {
-		expect(requireFolder('./tests/dummy-folders/stale', {
-			stale: ['public'],
+	it('include', () => {
+		expect(requireFolder('./tests/dummy-folders/include', {
+			include: ['public'],
 		})).to.deep.equal({
 			a: 'aaa',
 			public: {
 				_entryMap: {
-					path: resolve(__dirname, 'dummy-folders/stale/public'),
+					path: resolve(__dirname, 'dummy-folders/include/public'),
 					type: FOLDER,
 					name: 'public',
 					entries: {
@@ -65,7 +65,7 @@ describe('requireFolder', () => {
 							base: 'style',
 							ext: 'css',
 							name: 'style.css',
-							path: resolve(__dirname, 'dummy-folders/stale/public/style.css'),
+							path: resolve(__dirname, 'dummy-folders/include/public/style.css'),
 							type: 1,
 						}
 					}

@@ -1,13 +1,12 @@
 const {sep} = require('path');
-const mapFolder = require('map-folder');
-const {FILE, FOLDER} = mapFolder;
+const {mapFolderSync, FILE, FOLDER} = require('map-folder');
 
 function requireFolder (dirPath, opts = {}) {
-	const staleList = opts.stale || null;
+	const includeList = new Set(opts.include || []);
 
-	const dirMap = mapFolder.sync(dirPath, ({type, ext, base, path}) => (
-		type === FOLDER || ext === 'js' || base === '_INDEX_ONLY' || isStale(path, staleList)
-	));
+	const dirMap = mapFolderSync(dirPath, {
+		include: ['.js', '_INDEX_ONLY', ...includeList]
+	});
 
 	const aliasesMap = createAliasesMap(opts.alias || opts.aliases);
 	const groupsMap = createGroupsMap(opts.group || opts.groups);
@@ -22,7 +21,7 @@ function requireFolder (dirPath, opts = {}) {
 		const entryMap = entries[rawKey];
 		const key = resolveKey(rawKey, entryMap, aliasesMap, opts.mapKey);
 
-		if (staleList && isStale(entryMap.path, staleList)) {
+		if (includeList && includeList.has(entryMap.name)) {
 			obj[key] = {_entryMap: entryMap};
 		}
 		else if (groupsMap && groupsMap.has(key)) {
@@ -112,23 +111,6 @@ function forIn (obj, fn) {
 	for (const key in obj) {
 		if (hasOwn(key)) {
 			fn.call(obj, key, obj[key]);
-		}
-	}
-}
-
-function isStale (entryPath, staleList) {
-	if (!staleList) return false;
-	const staleLen = staleList.length;
-
-	for (let i = 0; i < staleLen; i++) {
-		const staleName = staleList[i];
-		const pathSplit = entryPath.split(sep);
-		const pathSegmentsLen = pathSplit.length;
-
-		for (let j = 0; j < pathSegmentsLen; j++) {
-			const segment = pathSplit[j];
-
-			if (segment === staleName) return true;
 		}
 	}
 }
