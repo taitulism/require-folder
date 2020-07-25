@@ -1,11 +1,13 @@
-const {sep} = require('path');
 const {mapFolderSync, FILE, FOLDER} = require('map-folder');
 
+const NOT_NULL = thing => thing;
+
 function requireFolder (dirPath, opts = {}) {
+	const indexFlagFile = opts.indexFlagFile;
 	const includeList = new Set(opts.include || []);
 
 	const dirMap = mapFolderSync(dirPath, {
-		include: ['.js', '_INDEX_ONLY', ...includeList]
+		include: ['.js', indexFlagFile, ...includeList].filter(NOT_NULL)
 	});
 
 	const aliasesMap = createAliasesMap(opts.alias || opts.aliases);
@@ -13,7 +15,7 @@ function requireFolder (dirPath, opts = {}) {
 	const hooks = opts.hooks || Object.create(null);
 	const {type, entries} = dirMap;
 
-	if (type === FILE || isIndexOnly(entries)) return require(dirMap.path);
+	if (type === FILE || isIndexOnly(indexFlagFile, entries)) return require(dirMap.path);
 
 	const obj = Object.create(null);
 
@@ -115,9 +117,9 @@ function forIn (obj, fn) {
 	}
 }
 
-function isIndexOnly (entries) {
+function isIndexOnly (indexFlagFile, entries) {
 	const entryCount = Object.keys(entries).length;
 	const singleIndex = entryCount === 1 && entries['index.js'];
 
-	return singleIndex || entries._INDEX_ONLY;
+	return singleIndex || entries[indexFlagFile];
 }
