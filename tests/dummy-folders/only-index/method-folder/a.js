@@ -1,1 +1,1 @@
-module.exports = 'ignore-a';
+module.exports = 'file-a';

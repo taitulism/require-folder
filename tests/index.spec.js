@@ -23,6 +23,33 @@ describe('requireFolder', () => {
 		});
 	});
 
+	it('skips a lonely `index` property', () => {
+		expect(requireFolder('./tests/dummy-folders/skip-index-prop')).to.deep.equal({
+			a: 'a',
+			bb: 'bb',
+			ccc: {
+				index: 'ccc-index',
+				ccc: 'ccc',
+			}
+		});
+	});
+
+	it('can require index.js only', () => {
+		expect(requireFolder('./tests/dummy-folders/only-index')).to.deep.equal({
+			a: 'aaa',
+			b: 'bbb',
+			'regular-folder': {
+				index: 'regular-index',
+				a: 'regular-a',
+				b: 'regular-b',
+			},
+			'method-folder': {
+				a: 'file-a',
+				b: 'file-b',
+			},
+		});
+	});
+
 	it('aliases', () => {
 		expect(requireFolder('./tests/dummy-folders/aliases', {
 			alias: {
@@ -31,7 +58,7 @@ describe('requireFolder', () => {
 				c: ['skip', 'cccc'],
 			},
 		})).to.deep.equal({
-			a: {index: 'aa'},
+			a: 'aa',
 			b: 'bbb',
 			c: 'cccc',
 			d: 'd',
@@ -56,18 +83,16 @@ describe('requireFolder', () => {
 		})).to.deep.equal({
 			a: 'aaa',
 			public: {
-				_entryMap: {
-					path: resolve(__dirname, 'dummy-folders/include/public'),
-					type: FOLDER,
-					name: 'public',
-					entries: {
-						'style.css': {
-							base: 'style',
-							ext: 'css',
-							name: 'style.css',
-							path: resolve(__dirname, 'dummy-folders/include/public/style.css'),
-							type: 1,
-						}
+				path: resolve(__dirname, 'dummy-folders/include/public'),
+				type: FOLDER,
+				name: 'public',
+				entries: {
+					'style.css': {
+						base: 'style',
+						ext: 'css',
+						name: 'style.css',
+						path: resolve(__dirname, 'dummy-folders/include/public/style.css'),
+						type: 1,
 					}
 				}
 			},
@@ -118,19 +143,6 @@ describe('requireFolder', () => {
 					b: 'level-2-b',
 				},
 			},
-		});
-	});
-
-	it('can require index.js only', () => {
-		expect(requireFolder('./tests/dummy-folders/only-index')).to.deep.equal({
-			a: 'aaa',
-			b: 'bbb',
-			'regular-folder': {
-				index: 'regular-index',
-				a: 'regular-a',
-				b: 'regular-b',
-			},
-			'method-folder': 'method-folder-index',
 		});
 	});
 });

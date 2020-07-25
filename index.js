@@ -13,7 +13,7 @@ function requireFolder (dirPath, opts = {}) {
 	const hooks = opts.hooks || Object.create(null);
 	const {type, entries} = dirMap;
 
-	if (type === FILE || entries._INDEX_ONLY) return require(dirMap.path);
+	if (type === FILE || isIndexOnly(entries)) return require(dirMap.path);
 
 	const obj = Object.create(null);
 
@@ -22,7 +22,7 @@ function requireFolder (dirPath, opts = {}) {
 		const key = resolveKey(rawKey, entryMap, aliasesMap, opts.mapKey);
 
 		if (includeList && includeList.has(entryMap.name)) {
-			obj[key] = {_entryMap: entryMap};
+			obj[key] = entryMap;
 		}
 		else if (groupsMap && groupsMap.has(key)) {
 			const groupName = groupsMap.get(key);
@@ -113,4 +113,11 @@ function forIn (obj, fn) {
 			fn.call(obj, key, obj[key]);
 		}
 	}
+}
+
+function isIndexOnly (entries) {
+	const entryCount = Object.keys(entries).length;
+	const singleIndex = entryCount === 1 && entries['index.js'];
+
+	return singleIndex || entries._INDEX_ONLY;
 }
