@@ -1,13 +1,13 @@
 const mapFolder = require('map-folder');
 
-const NOT_NULL = thing => thing;
-
 function requireFolder (dirPath, opts = {}) {
 	const indexFlagFile = opts.indexFlagFile;
 	const includeList = new Set(opts.include || []);
+	const excludeList = opts.exclude || [];
 
 	const dirMap = mapFolder(dirPath, {
-		include: ['.js', indexFlagFile, ...includeList].filter(NOT_NULL)
+		include: ['.js', indexFlagFile, ...includeList],
+		exclude: excludeList
 	});
 
 	const aliasesMap = createAliasesMap(opts.alias || opts.aliases);

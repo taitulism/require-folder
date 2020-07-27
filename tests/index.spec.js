@@ -120,6 +120,17 @@ describe('requireFolder', () => {
 			});
 		});
 
+		it('exclude', () => {
+			expect(requireFolder('./tests/dummy-folders/exclude', {
+				exclude: ['c', 'ignored.js'],
+			})).to.deep.equal({
+				A: 'A',
+				B: {
+					b: 'bbb'
+				}
+			});
+		});
+
 		it('groups', () => {
 			expect(requireFolder('./tests/dummy-folders/groups', {
 				groups: {
