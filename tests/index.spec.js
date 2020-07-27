@@ -1,6 +1,5 @@
 const {resolve} = require('path');
 const {expect} = require('chai');
-const {FOLDER} = require('map-folder');
 
 const requireFolder = require('../');
 
@@ -106,7 +105,7 @@ describe('requireFolder', () => {
 				a: 'aaa',
 				public: {
 					path: resolve(__dirname, 'dummy-folders/include/public'),
-					type: FOLDER,
+					isFile: false,
 					name: 'public',
 					entries: {
 						'style.css': {
@@ -114,7 +113,7 @@ describe('requireFolder', () => {
 							ext: 'css',
 							name: 'style.css',
 							path: resolve(__dirname, 'dummy-folders/include/public/style.css'),
-							type: 1,
+							isFile: true,
 						}
 					}
 				},

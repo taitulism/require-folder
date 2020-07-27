@@ -24,6 +24,6 @@
       "chai-as-promised": "*"
    },
    "dependencies": {
-      "map-folder": "^1.1.7"
+      "map-folder": "^1.2.7"
    }
 }

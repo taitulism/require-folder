@@ -1,4 +1,4 @@
-const {mapFolderSync, FILE, FOLDER} = require('map-folder');
+const mapFolder = require('map-folder');
 
 const NOT_NULL = thing => thing;
 
@@ -6,16 +6,16 @@ function requireFolder (dirPath, opts = {}) {
 	const indexFlagFile = opts.indexFlagFile;
 	const includeList = new Set(opts.include || []);
 
-	const dirMap = mapFolderSync(dirPath, {
+	const dirMap = mapFolder(dirPath, {
 		include: ['.js', indexFlagFile, ...includeList].filter(NOT_NULL)
 	});
 
 	const aliasesMap = createAliasesMap(opts.alias || opts.aliases);
 	const groupsMap = createGroupsMap(opts.group || opts.groups);
 	const hooks = opts.hooks || Object.create(null);
-	const {type, entries} = dirMap;
+	const {isFile, entries} = dirMap;
 
-	if (type === FILE || isIndexOnly(indexFlagFile, entries)) return require(dirMap.path);
+	if (isFile || isIndexOnly(indexFlagFile, entries)) return require(dirMap.path);
 
 	const obj = Object.create(null);
 
@@ -47,7 +47,7 @@ module.exports = requireFolder;
 
 function resolveKey (rawKey, map, aliasMap, keyMapper) {
 	// map.base || key
-	const key = (map.type === FILE) ? map.base : rawKey;
+	const key = (map.isFile) ? map.base : rawKey;
 
 	if (aliasMap && aliasMap.has(key)) {
 		return aliasMap.get(key);
