@@ -19,9 +19,8 @@ function requireFolder (dirPath, opts = {}) {
 
 	const obj = Object.create(null);
 
-	forIn(entries, (rawKey) => {
-		const entryMap = entries[rawKey];
-		const key = resolveKey(rawKey, entryMap, aliasesMap, opts.mapKey);
+	forIn(entries, (mapKey, entryMap) => {
+		const key = resolveKey(mapKey, entryMap, aliasesMap, opts.mapKey);
 
 		if (includeList && includeList.has(entryMap.name)) {
 			obj[key] = entryMap;
@@ -118,8 +117,9 @@ function forIn (obj, fn) {
 }
 
 function isIndexOnly (indexFlagFile, entries) {
-	const entryCount = Object.keys(entries).length;
-	const singleIndex = entryCount === 1 && entries['index.js'];
+	return entries['index.js'];
+	// const entryCount = Object.keys(entries).length;
+	// const singleIndex = entryCount === 1 && entries['index.js'];
 
-	return singleIndex || entries[indexFlagFile];
+	// return singleIndex || entries[indexFlagFile];
 }

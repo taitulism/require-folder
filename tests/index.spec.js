@@ -22,14 +22,23 @@ describe('requireFolder', () => {
 		});
 	});
 
+	it('requires `index.js` only - if exists', () => {
+		expect(requireFolder('./tests/dummy-folders/index-only')).to.deep.equal({
+			a: 'a-index',
+			b: 'b-index',
+			c: {
+				c1: 'c1',
+				c2: 'c2',
+			}
+		});
+	});
+
 	it('skips a lonely `index` property', () => {
 		expect(requireFolder('./tests/dummy-folders/skip-index-prop')).to.deep.equal({
-			a: 'a',
-			bb: 'bb',
-			ccc: {
-				index: 'ccc-index',
-				ccc: 'ccc',
-			}
+			aa: 'index',
+			bb: {
+				'not-index': 'not-index'
+			},
 		});
 	});
 
@@ -65,24 +74,6 @@ describe('requireFolder', () => {
 				b: 'bbb',
 				c: 'cccc',
 				d: 'd',
-			});
-		});
-
-		it('indexFlagFile', () => {
-			expect(requireFolder('./tests/dummy-folders/index-flag-file', {
-				indexFlagFile: '.index'
-			})).to.deep.equal({
-				a: 'aaa',
-				b: 'bbb',
-				'regular-folder': {
-					index: 'regular-index',
-					a: 'regular-a',
-					b: 'regular-b',
-				},
-				'method-folder': {
-					a: 'file-a',
-					b: 'file-b',
-				},
 			});
 		});
 
@@ -169,6 +160,24 @@ describe('requireFolder', () => {
 					},
 				},
 			})).to.deep.equal({myKey: 'my-value'});
+		});
+
+		it.skip('indexFlagFile', () => {
+			expect(requireFolder('./tests/dummy-folders/index-flag-file', {
+				indexFlagFile: '.index'
+			})).to.deep.equal({
+				a: 'aaa',
+				b: 'bbb',
+				'regular-folder': {
+					index: 'regular-index',
+					a: 'regular-a',
+					b: 'regular-b',
+				},
+				'method-folder': {
+					a: 'file-a',
+					b: 'file-b',
+				},
+			});
 		});
 	});
 });
