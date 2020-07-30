@@ -62,21 +62,6 @@ describe('requireFolder', () => {
 	});
 
 	describe('options', () => {
-		it('aliases', () => {
-			expect(requireFolder('./tests/dummy-folders/aliases', {
-				alias: {
-					a: 'aa',
-					b: ['bbb'],
-					c: ['skip', 'cccc'],
-				},
-			})).to.deep.equal({
-				a: 'aa',
-				b: 'bbb',
-				c: 'cccc',
-				d: 'd',
-			});
-		});
-
 		it('mapKey', () => {
 			expect(requireFolder('./tests/dummy-folders/map-key', {
 				mapKey (rawKey) {
@@ -171,14 +156,14 @@ describe('requireFolder', () => {
 			})).to.deep.equal({myKey: 'my-value'});
 		});
 
-		it('hooks & alias', () => {
-			expect(requireFolder('./tests/dummy-folders/hook-and-alias', {
-				alias: {ccc: 'bbb'},
+		it('hooks & normalizeKeys', () => {
+			expect(requireFolder('./tests/dummy-folders/hook-and-normalize', {
+				normalizeKeys: true,
 				hooks: {
-					ccc: (requiredModule, ctxObj, entryMap) => {
+					a_bb_c: (requiredModule, ctxObj, entryMap) => {
 						expect(requiredModule).to.equal('my-value');
 						expect(ctxObj).to.be.an('object');
-						expect(entryMap.name).to.equal('bbb.js');
+						expect(entryMap.name).to.equal('a-bb   c.js');
 						ctxObj.myKey = requiredModule;
 					},
 				},

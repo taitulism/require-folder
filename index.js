@@ -1,26 +1,26 @@
 const mapFolder = require('map-folder');
 
+const hasIndex = entries => !!entries['index.js'];
+
 function requireFolder (dirPath, opts = {}) {
-	const indexFlagFile = opts.indexFlagFile;
 	const includeList = new Set(opts.include || []);
 	const excludeList = opts.exclude || [];
 
 	const dirMap = mapFolder(dirPath, {
-		include: ['.js', indexFlagFile, ...includeList],
+		include: ['.js', ...includeList],
 		exclude: excludeList
 	});
 
-	const aliasesMap = createAliasesMap(opts.alias || opts.aliases);
 	const groupsMap = createGroupsMap(opts.group || opts.groups);
 	const hooks = opts.hooks || Object.create(null);
 	const {isFile, entries} = dirMap;
 
-	if (isFile || isIndexOnly(indexFlagFile, entries)) return require(dirMap.path);
+	if (isFile || hasIndex(entries)) return require(dirMap.path);
 
 	const obj = Object.create(null);
 
 	forIn(entries, (mapKey, entryMap) => {
-		const key = resolveKey(entryMap, aliasesMap, opts.mapKey, opts.normalizeKeys);
+		const key = resolveKey(entryMap, opts.mapKey, opts.normalizeKeys);
 
 		if (includeList && includeList.has(entryMap.name)) {
 			obj[key] = entryMap;
@@ -45,15 +45,9 @@ function requireFolder (dirPath, opts = {}) {
 
 module.exports = requireFolder;
 
-function resolveKey (map, aliasMap, keyMapper, normalizeKeys = false) {
+function resolveKey (map, keyMapper, normalizeKeys = false) {
 	const rawKey = (map.isFile) ? map.base : map.name;
-
-	if (aliasMap && aliasMap.has(rawKey)) {
-		return aliasMap.get(rawKey);
-	}
-
 	const key = normalizeKeys ? normalizeKey(rawKey) : rawKey;
-
 	return typeof keyMapper == 'function' ? keyMapper(key) : key;
 }
 
@@ -62,12 +56,6 @@ const DASHES_N_SPACES_RGX = /(-|\s)+/ug;
 
 function normalizeKey (rawKey) {
 	return rawKey.replace(DASHES_N_SPACES_RGX, UNDERSCORE);
-}
-
-function createAliasesMap (rawAliases) {
-	if (!rawAliases) return null;
-
-	return flipFlatObjToMap(rawAliases);
 }
 
 function createGroupsMap (rawGroups) {
@@ -123,12 +111,4 @@ function forIn (obj, fn) {
 			fn.call(obj, key, obj[key]);
 		}
 	}
-}
-
-function isIndexOnly (indexFlagFile, entries) {
-	return entries['index.js'];
-	// const entryCount = Object.keys(entries).length;
-	// const singleIndex = entryCount === 1 && entries['index.js'];
-
-	// return singleIndex || entries[indexFlagFile];
 }
