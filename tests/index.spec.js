@@ -161,10 +161,11 @@ describe('requireFolder', () => {
 		it('hooks', () => {
 			expect(requireFolder('./tests/dummy-folders/hooks', {
 				hooks: {
-					aaa: (ctxObj, entryMap) => {
+					aaa: (requiredModule, ctxObj, entryMap) => {
+						expect(requiredModule).to.equal('my-value');
 						expect(ctxObj).to.be.an('object');
 						expect(entryMap.name).to.equal('aaa.js');
-						ctxObj.myKey = require(entryMap.path);
+						ctxObj.myKey = requiredModule;
 					},
 				},
 			})).to.deep.equal({myKey: 'my-value'});
@@ -174,10 +175,11 @@ describe('requireFolder', () => {
 			expect(requireFolder('./tests/dummy-folders/hook-and-alias', {
 				alias: {ccc: 'bbb'},
 				hooks: {
-					ccc: (ctxObj, entryMap) => {
+					ccc: (requiredModule, ctxObj, entryMap) => {
+						expect(requiredModule).to.equal('my-value');
 						expect(ctxObj).to.be.an('object');
 						expect(entryMap.name).to.equal('bbb.js');
-						ctxObj.myKey = require(entryMap.path);
+						ctxObj.myKey = requiredModule;
 					},
 				},
 			})).to.deep.equal({myKey: 'my-value'});

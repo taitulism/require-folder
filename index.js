@@ -32,10 +32,11 @@ function requireFolder (dirPath, opts = {}) {
 			obj[groupName][key] = requireFolder(entryMap.path, opts);
 		}
 		else {
-			const hookFn = hooks[key];
+			const requiredModule = requireFolder(entryMap.path, opts);
+			const hook = hooks[key];
 
-			if (hookFn) hookFn(obj, entryMap);
-			else obj[key] = requireFolder(entryMap.path, opts);
+			if (hook) hook(requiredModule, obj, entryMap);
+			else obj[key] = requiredModule;
 		}
 	});
 
