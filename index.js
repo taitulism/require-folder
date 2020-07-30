@@ -20,7 +20,7 @@ function requireFolder (dirPath, opts = {}) {
 	const obj = Object.create(null);
 
 	forIn(entries, (mapKey, entryMap) => {
-		const key = resolveKey(mapKey, entryMap, aliasesMap, opts.mapKey);
+		const key = resolveKey(entryMap, aliasesMap, opts.mapKey, opts.normalizeKeys);
 
 		if (includeList && includeList.has(entryMap.name)) {
 			obj[key] = entryMap;
@@ -44,15 +44,23 @@ function requireFolder (dirPath, opts = {}) {
 
 module.exports = requireFolder;
 
-function resolveKey (rawKey, map, aliasMap, keyMapper) {
-	// map.base || key
-	const key = (map.isFile) ? map.base : rawKey;
+function resolveKey (map, aliasMap, keyMapper, normalizeKeys = false) {
+	const rawKey = (map.isFile) ? map.base : map.name;
 
-	if (aliasMap && aliasMap.has(key)) {
-		return aliasMap.get(key);
+	if (aliasMap && aliasMap.has(rawKey)) {
+		return aliasMap.get(rawKey);
 	}
 
+	const key = normalizeKeys ? normalizeKey(rawKey) : rawKey;
+
 	return typeof keyMapper == 'function' ? keyMapper(key) : key;
+}
+
+const UNDERSCORE = '_';
+const DASHES_N_SPACES_RGX = /(-|\s)+/ug;
+
+function normalizeKey (rawKey) {
+	return rawKey.replace(DASHES_N_SPACES_RGX, UNDERSCORE);
 }
 
 function createAliasesMap (rawAliases) {

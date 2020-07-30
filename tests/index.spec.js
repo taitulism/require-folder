@@ -89,6 +89,14 @@ describe('requireFolder', () => {
 			});
 		});
 
+		it('normalizeKeys', () => {
+			expect(requireFolder('./tests/dummy-folders/underscores', { normalizeKeys: true })).to.deep.equal({
+				a_a_a: 'value-a',
+				b_b_b: 'value-b',
+				cc_cc_cc: 'value-c',
+			});
+		});
+
 		it('include', () => {
 			expect(requireFolder('./tests/dummy-folders/include', {
 				include: ['public'],
