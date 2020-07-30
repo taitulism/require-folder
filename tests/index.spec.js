@@ -119,6 +119,19 @@ describe('requireFolder', () => {
 			});
 		});
 
+		it('include json', () => {
+			expect(requireFolder('./tests/dummy-folders/include-json', {
+				include: ['.json'],
+			})).to.deep.equal({
+				a: 'aaa',
+				configurations: {
+					configs: {
+						color: "red"
+					}
+				},
+			});
+		});
+
 		it('exclude', () => {
 			expect(requireFolder('./tests/dummy-folders/exclude', {
 				exclude: ['c', 'ignored.js'],
