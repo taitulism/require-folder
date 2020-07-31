@@ -47,14 +47,10 @@ module.exports = {
 		'block-spacing': 'error',
 		'brace-style': ['error', 'stroustrup'],
 		'callback-return': 'warn',
-		camelcase: [
-			'error', {
-				allow: ['^REGEX_'],
-			},
-		],
+//		camelcase: [ 'off', { allow: ['^REGEX_'] } ],
 //		"capitalized-comments": "off",
 		'class-methods-use-this': 'error',
-		'comma-dangle': ['error', 'always-multiline'],
+//		'comma-dangle': ['off', 'always-multiline'],
 		'comma-spacing': 'error',
 		'comma-style': 'error',
 		complexity: 'error',
@@ -121,11 +117,8 @@ module.exports = {
 			},
 		],
 		'new-parens': 'error',
-		'newline-after-var': [
-			'error',
-			'always',
-		],
-		'newline-before-return': 'error',
+//		'newline-after-var': [ 'off', 'always' ],
+//		'newline-before-return': 'off',
 		'newline-per-chained-call': [
 			'error', {
 				ignoreChainWithDepth: 3,
@@ -187,7 +180,7 @@ module.exports = {
 		'no-native-reassign': 'error',
 		'no-negated-condition': 'error',
 		'no-negated-in-lhs': 'error',
-		'no-nested-ternary': 'error',
+//		'no-nested-ternary': 'off',
 		'no-new': 'error',
 		'no-new-func': 'error',
 		'no-new-object': 'error',
@@ -276,7 +269,7 @@ module.exports = {
 //		"prefer-reflect": "off", // Deprecated
 		'prefer-rest-params': 'error',
 		'prefer-spread': 'error',
-		'prefer-template': 'error',
+//		'prefer-template': 'off',
 		'quote-props': ['error', 'as-needed'],
 		quotes: [
 			'error',

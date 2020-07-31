@@ -120,7 +120,7 @@ describe('requireFolder', () => {
 				a: 'aaa',
 				configurations: {
 					configs: {
-						color: "red"
+						color: 'red'
 					}
 				},
 			});

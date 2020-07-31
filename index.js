@@ -1,6 +1,7 @@
 const mapFolder = require('map-folder');
 
-const hasIndex = entries => !!entries['index.js'];
+const hasIndex = entries => Boolean(entries['index.js']);
+const hasFileWithSameName = (entries, name) => Boolean(entries[name + '.js']);
 
 function requireFolder (dirPath, opts = {}) {
 	const includeList = new Set(opts.include || []);
@@ -21,7 +22,7 @@ function requireFolder (dirPath, opts = {}) {
 
 	forIn(entries, (mapKey, entryMap) => {
 		const key = resolveKey(entryMap, opts.mapKey, opts.camelCase, opts.normalizeKeys);
-		if (!entryMap.isFile && entries[key + '.js']) return;
+		if (!entryMap.isFile && hasFileWithSameName(entries, key)) return;
 
 		if (includeList && includeList.has(entryMap.name)) {
 			obj[key] = entryMap;
@@ -48,11 +49,12 @@ module.exports = requireFolder;
 
 function resolveKey (map, keyMapper, camelCase, normalizeKeys) {
 	const rawKey = (map.isFile) ? map.base : map.name;
+
 	const key = camelCase
 		? convertToCamelCase(rawKey)
 		: normalizeKeys
-		? normalizeKey(rawKey)
-		: rawKey
+			? normalizeKey(rawKey)
+			: rawKey
 	;
 
 	return typeof keyMapper == 'function' ? keyMapper(key) : key;
