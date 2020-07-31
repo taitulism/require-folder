@@ -21,6 +21,7 @@ function requireFolder (dirPath, opts = {}) {
 
 	forIn(entries, (mapKey, entryMap) => {
 		const key = resolveKey(entryMap, opts.mapKey, opts.normalizeKeys);
+		if (!entryMap.isFile && entries[key + '.js']) return;
 
 		if (includeList && includeList.has(entryMap.name)) {
 			obj[key] = entryMap;
@@ -101,14 +102,13 @@ function flipFlatObjToMap (obj) {
 	return map;
 }
 
-const hasOwnProp = Object.hasOwnProperty;
-
 function forIn (obj, fn) {
-	const hasOwn = hasOwnProp.bind(obj);
+	const keys = Object.keys(obj);
+	let index = keys.length - 1;
 
-	for (const key in obj) {
-		if (hasOwn(key)) {
-			fn.call(obj, key, obj[key]);
-		}
+	while (index >= 0) {
+		const key = keys[index];
+		fn.call(obj, key, obj[key]);
+		index -= 1;
 	}
 }
