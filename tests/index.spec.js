@@ -75,10 +75,19 @@ describe('requireFolder', () => {
 		});
 
 		it('normalizeKeys', () => {
-			expect(requireFolder('./tests/dummy-folders/underscores', { normalizeKeys: true })).to.deep.equal({
+			expect(requireFolder('./tests/dummy-folders/normalize-keys', { normalizeKeys: true })).to.deep.equal({
 				a_a_a: 'value-a',
 				b_b_b: 'value-b',
 				cc_cc_cc: 'value-c',
+				dd_d_d: 'value-d',
+			});
+		});
+
+		it('camelCase', () => {
+			expect(requireFolder('./tests/dummy-folders/camel-case', { camelCase: true })).to.deep.equal({
+				aaBbCc: 'aa bb cc',
+				aaaBbbCcc: 'aaa_bbb_ccc',
+				aaaaBbbbCccc: 'aaaa-bbbb-cccc',
 			});
 		});
 

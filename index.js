@@ -20,7 +20,7 @@ function requireFolder (dirPath, opts = {}) {
 	const obj = Object.create(null);
 
 	forIn(entries, (mapKey, entryMap) => {
-		const key = resolveKey(entryMap, opts.mapKey, opts.normalizeKeys);
+		const key = resolveKey(entryMap, opts.mapKey, opts.camelCase, opts.normalizeKeys);
 		if (!entryMap.isFile && entries[key + '.js']) return;
 
 		if (includeList && includeList.has(entryMap.name)) {
@@ -46,17 +46,37 @@ function requireFolder (dirPath, opts = {}) {
 
 module.exports = requireFolder;
 
-function resolveKey (map, keyMapper, normalizeKeys = false) {
+function resolveKey (map, keyMapper, camelCase, normalizeKeys) {
 	const rawKey = (map.isFile) ? map.base : map.name;
-	const key = normalizeKeys ? normalizeKey(rawKey) : rawKey;
+	const key = camelCase
+		? convertToCamelCase(rawKey)
+		: normalizeKeys
+		? normalizeKey(rawKey)
+		: rawKey
+	;
+
 	return typeof keyMapper == 'function' ? keyMapper(key) : key;
 }
 
 const UNDERSCORE = '_';
-const DASHES_N_SPACES_RGX = /(-|\s)+/ug;
+const DASHES_UNDERSCORES_SPACES = /(-|_|\s)+/ug;
+const NOT_WORD_CHAR_NOR_UNDERSCORE = /\W+|_+/u;
 
 function normalizeKey (rawKey) {
-	return rawKey.replace(DASHES_N_SPACES_RGX, UNDERSCORE);
+	return rawKey.replace(DASHES_UNDERSCORES_SPACES, UNDERSCORE);
+}
+
+function convertToCamelCase (str) {
+	return str
+		.split(NOT_WORD_CHAR_NOR_UNDERSCORE)
+		.map((word, i) => (i === 0 ? word : convertToTitle(word)))
+		.join('')
+	;
+}
+
+function convertToTitle (str) {
+	const upperFirstChar = str[0].toUpperCase();
+	return upperFirstChar + str.substr(1);
 }
 
 function createGroupsMap (rawGroups) {
