@@ -5,6 +5,7 @@ require-folder
 ==============
 Recursively require all files within a folder.
 
+
 Installation
 ------------
 ```sh
@@ -16,30 +17,38 @@ Usage
 ```js
 const requireFolder = require('require-folder');
 
-const result = requireFolder('path/to/folder', options);
+const result = requireFolder('path/to/target-folder', options);
 ```
 
-Result
------
-Example folder structure:
+### Example folder structure:
 ```
 └─ target-folder
-   ├─ utils
-   │  ├─ string_utils.js
-   │  └─ array_utils.js
-   └─ index.js
+   ├─ controller.js
+   ├─ foo
+   │  ├─ index.js
+   │  ├─ bar.js
+   │  └─ baz.js
+   └─ utils
+      ├─ string_utils.js
+      └─ array_utils.js
 ```
 
-Results:
+### Example results:
 ```js
 result = {
-    index: require('target-folder'),
+    controller: require('target-folder/controller'),
+    foo: require('target-folder/foo'),
     utils: {
         string_utils: require('target-folder/utils/string_utils')
         array_utils: require('target-folder/utils/array_utils')
     }
 }
 ```
+
+Similar to Node's native `require` behavior, when a folder has an `index.js` file it will be the only export for that folder.  
+When there's no `index.js` file, all `.js` files will be required individually.
+
+
 
 ## API
 ------------------------------------------------------------------------
@@ -52,86 +61,87 @@ result = {
 An object contains all the required modules in the target folder. The object's structure is generally a representation of the folder.
 
 ## Options
+* [camelCase](#camelcase)
+* [normalizeKeys](#normalizekeys)
+* [mapKey](#mapKey)
+* [groups](#groups)
+* [hooks](#hooks)
 * [exclude](#exclude)
 * [include](#include)
-* [indexFlagFile](#indexflagfile)
-* [skipSingleIndex](#skipsingleindex)
-* [aliases](#aliases)
-* [groups](#groups)
-* [mapKey](#mapKey)
-* [hooks](#hooks)
 
 
 
-### `exclude`
-file & folder names to skip. See [map-folder](https://github.com/taitulism/map-folder/#map-folder) docs for more details.
-
-
-
-### `include`
-file & folder names and extensions to map only. See [map-folder](https://github.com/taitulism/map-folder/#map-folder) docs for more details.
-
-
-
-### `indexFlagFile`
-Naturally in Node, when you require a folder you get its `index.js` file content, which is everything that folder `exports`. With `require-folder`, you will have all the `exports` of all files, including `index.js`.
-
-If you want Node's natural behavior for certain folders ...........................?????????????
-
-When you have a folder and it's main file, `index.js`, requires everything around it
-
-
-
-### `skipSingleIndex`
-By default, `require-folder` skips an `index` property if it's the only property on an object(the only file in a folder). Set to `false` if you want to keep single index files.
+### `camelCase`
+When set to `true`, converts required modules\` names into camelCase style. Any character that is not a letter, a number or an underscore is removed. This enables using js dot notation when using the result object.
 
 Example:
 ```
-└─ target-folder
-   └─ module_A
-      └─ index.js
+└─ my utils.js
 ```
 ```js
-const result = requireFolder('./target-folder', {
-    skipSingleIndex: false
-});
+requireFolder('./target-folder', {
+    camelCase: true
+})
 ```
-When `true` (default):
 ```js
-result = {
-    module_A: require('index.js')
-}
-```
+// when `false` (default)
+result['my utils']
 
-When `false`:
-```js
-result = {
-    module_A: {
-        index: require('index.js')
-    }
-}
-```
+// when `true`
+result.myUtils
+``` 
 
+
+### `normalizeKeys`
+When set to `true`, converts dashes and spaces in required modules\` names to underscores. This enables using js dot notation when using the result object.
+
+Example:
+```
+└─ my utils.js
+```
+```js
+requireFolder('./target-folder', {
+    normalizeKeys: true
+})
+```
+```js
+// when `false` (default)
+result['my utils']
+
+// when `true`
+result.my_utils
+``` 
+
+>Multiple dashes and spaces in a row are merged into a single underscore.
 
 
 ### `mapKey`
-You can rename the required modules\` names by using a `mapKey` function. This could be used for normalizing  file names (lower/upper case), converting dashes to undersocres or spaces into camelCase, for example. This function gets called with the file/folder name. The returned string will be used as the new prop name on the result object.
+When the `camelCase` and `normalizeKeys` options are not enough, you can rename the required modules\` by passing a mapper function to the `mapKey` option. This function gets called with the original entry name (file/folder). The returned string will be used as the new prop name on the result object.
+
+>`mapKey` function is called last, after any other conversion made by `camelCase` or `normalizeKeys`.
 
 Example:
 ```
 └─ target-folder
+   ├─ common-utils.js
    ├─ HELLO.js
    └─ WORLD.js
 ```
 ```js
 requireFolder('./target-folder', {
-    mapKey (rawKey) {
-        return rawKey.toLowerCase();
+    mapKey (name) {
+        if (name === 'common-utils') {
+            return '$utils';
+        }
+        else {
+            return name.toLowerCase();
+        }
     }
 })
 ```
 ```js
 result = {
+    $utils: require('target-folder/common-utils'),
     hello: require('target-folder/HELLO'),
     world: require('target-folder/WORLD'),
 }
@@ -139,22 +149,8 @@ result = {
 
 
 
-### `aliases`
-You can map different names to the same key. For example, when a certain prop could be found in different variation: with spaces, dashes or underscores, and you want to convert them all into camelCase.
-```js
-// converts all the variations in the array into "helloWorld"
-requireFolder('./target-folder', {
-    alias: {
-        helloWorld: ['hello world', 'hello-world', 'hello_world'],
-    }
-})
-```
-
-> Having more than one aliased filename is stupid....................................
-
-
-
 ### `groups`
+Alias: `group`  
 You can group multiple items under one namespace property.
 
 Example:
@@ -186,16 +182,20 @@ result = {
 
 
 ### `hooks`
-Sometimes you need more control over the requiring details. You can use the `hooks` option for custom requiring certain entries (files or folder). 
+Sometimes you need even more control over the requiring details. You can use the `hooks` option for custom requiring certain entries (files or folder). 
 
 `hooks` should be an object that its keys are the names of the entries (files or folders) you would like to customize and values are their hook functions.
 
+>`hooks` keys will match resolved keys, after any conversions made by `camelCase`, `normalizeKeys` or `mapKey`.
+
 
 #### Hook Function Arguments
-* `parent` - the parent folder context object which current entry will be required into.
+* `requiredModule` - the actual exports of the current entry.
+* `context` - the parent folder context object which current entry will be required into.
 * `entryMap` - an entry meta data object. Contains its path, type, name, base name & extension (if file) or its entries (if folder).
 
 See [map-folder](https://github.com/taitulism/map-folder/#entry-map-object) docs for more details about the `entryMap` object.
+
 
 Example:
 ```
@@ -204,17 +204,14 @@ Example:
 ```
 ```js
 requireFolder('./target-folder', {
+    camelCase: true,
     hooks: {
-        'my-file': (parent, entryMap) => {
-            
-            // entryMap.path = 'path/to/target-folder/my-file'
-            const myFileExport = require(entryMap.path);
-
+        myFile: (requiredModule, contextObj, entryMap) => {
             if (condition) {
-                parent.foo = myFileExport;
+                contextObj.foo = requiredModule;
             }
             else {
-                parent.bar = myFileExport;
+                contextObj.bar = requiredModule;
             }
         },
     }
@@ -225,5 +222,75 @@ result = {
     foo: require('target-folder/my-file'),
     // or
     bar: require('target-folder/my-file'),
+}
+```
+
+
+### `exclude`
+A list of file & folder names to skip. See [map-folder](https://github.com/taitulism/map-folder/#map-folder) docs for more details.
+
+```
+└─ target-folder
+   ├─ foo.js
+   ├─ bar.js
+   └─ old-version
+      ├─ foo.js
+      └─ bar.js
+```
+```js
+const result = requireFolder('./target-folder', {
+    exclude: ['old-version']
+});
+```
+```js
+result = {
+    foo: require('target-folder/foo'),
+    bar: require('target-folder/bar'),
+}
+```
+
+
+### `include`
+A list of file & folder names and extensions to map and require. Folders are only mapped (**not required**) and extensions are required (currently only supporting `.json`).
+See [map-folder](https://github.com/taitulism/map-folder/#map-folder) docs for more details.
+
+```
+└─ target-folder
+   ├─ foo.js
+   ├─ styles
+   │  ├─ reset.css
+   │  └─ main.css
+   └─ config.json
+```
+```js
+const result = requireFolder('./target-folder', {
+    include: ['styles', '.json']
+});
+```
+```js
+result = {
+    foo: require('target-folder/foo'),
+    config: require('target-folder/config.json'),  // <-- require json files
+    styles: {                                      // <-- only maps folders
+        path: 'path/to/target-folder/style',
+        isFile: false,
+        name: 'styles',
+        entries: {
+            'reset.css': {
+                base: 'reset',
+                ext: 'css',
+                name: 'reset.css',
+                path:'path/to/target-folder/styles/reset.css',
+                isFile: true,
+            }
+            'main.css': {
+                base: 'main',
+                ext: 'css',
+                name: 'main.css',
+                path:'path/to/target-folder/styles/main.css',
+                isFile: true,
+            }
+        }
+    }
 }
 ```
