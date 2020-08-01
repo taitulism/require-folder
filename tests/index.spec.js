@@ -178,23 +178,5 @@ describe('requireFolder', () => {
 				},
 			})).to.deep.equal({myKey: 'my-value'});
 		});
-
-		it.skip('indexFlagFile', () => {
-			expect(requireFolder('./tests/dummy-folders/index-flag-file', {
-				indexFlagFile: '.index'
-			})).to.deep.equal({
-				a: 'aaa',
-				b: 'bbb',
-				'regular-folder': {
-					index: 'regular-index',
-					a: 'regular-a',
-					b: 'regular-b',
-				},
-				'method-folder': {
-					a: 'file-a',
-					b: 'file-b',
-				},
-			});
-		});
 	});
 });
