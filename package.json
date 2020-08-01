@@ -3,11 +3,10 @@
    "description": "Recursively require all files within a folder.",
    "version": "0.0.0",
    "license": "MIT",
-   "private": true,
    "main": "./index.js",
    "author": "Taitu Lizenbaum <taitu.dev@gmail.com>",
-   "homepage": "https://github.com/taitulism/TPL#readme",
-   "repository": "github:taitulism/TPL",
+   "homepage": "https://github.com/taitulism/require-folder#readme",
+   "repository": "github:taitulism/require-folder",
    "scripts": {
       "dev": "mocha ./tests --watch",
       "test": "mocha ./tests",
@@ -18,12 +17,18 @@
       "postversion": "git push && git push --tags"
    },
    "devDependencies": {
-      "eslint": "*",
-      "mocha": "*",
-      "chai": "*",
-      "chai-as-promised": "*"
+      "chai": "4.2.0",
+      "eslint": "7.2.0",
+      "mocha": "8.0.1"
    },
    "dependencies": {
       "map-folder": "^1.2.7"
-   }
+   },
+   "keywords": [
+	   "require",
+	   "directory",
+	   "folder",
+	   "dir",
+	   "recursive"
+   ]
 }
