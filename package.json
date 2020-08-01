@@ -1,7 +1,7 @@
 {
    "name": "require-folder",
    "description": "Recursively require all files within a folder.",
-   "version": "0.0.0",
+   "version": "1.0.0",
    "license": "MIT",
    "main": "./index.js",
    "author": "Taitu Lizenbaum <taitu.dev@gmail.com>",
@@ -25,10 +25,10 @@
       "map-folder": "^1.2.7"
    },
    "keywords": [
-	   "require",
-	   "directory",
-	   "folder",
-	   "dir",
-	   "recursive"
+      "require",
+      "directory",
+      "folder",
+      "dir",
+      "recursive"
    ]
 }
