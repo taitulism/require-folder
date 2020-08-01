@@ -12,6 +12,8 @@ function requireFolder (dirPath, opts = {}) {
 		exclude: excludeList
 	});
 
+	opts.mapKey = typeof opts.mapKey == 'function' ? opts.mapKey : null;
+
 	const groupsMap = createGroupsMap(opts.group || opts.groups);
 	const hooks = opts.hooks || Object.create(null);
 	const {isFile, entries} = dirMap;
@@ -21,7 +23,7 @@ function requireFolder (dirPath, opts = {}) {
 	const obj = Object.create(null);
 
 	forIn(entries, (mapKey, entryMap) => {
-		const key = resolveKey(entryMap, opts.mapKey, opts.camelCase, opts.normalizeKeys);
+		const key = resolveKey(entryMap, opts);
 		if (!entryMap.isFile && hasFileWithSameName(entries, key)) return;
 
 		if (includeList && includeList.has(entryMap.name)) {
@@ -47,7 +49,13 @@ function requireFolder (dirPath, opts = {}) {
 
 module.exports = requireFolder;
 
-function resolveKey (map, keyMapper, camelCase, normalizeKeys) {
+function resolveKey (map, opts) {
+	const  {
+		mapKey: keyMapper,
+		camelCase,
+		normalizeKeys
+	} = opts;
+
 	const rawKey = (map.isFile) ? map.base : map.name;
 
 	const key = camelCase
@@ -57,7 +65,7 @@ function resolveKey (map, keyMapper, camelCase, normalizeKeys) {
 			: rawKey
 	;
 
-	return typeof keyMapper == 'function' ? keyMapper(key) : key;
+	return keyMapper ? keyMapper(key) : key;
 }
 
 const UNDERSCORE = '_';
