@@ -79,12 +79,13 @@ function normalizeKey (rawKey) {
 function convertToCamelCase (str) {
 	return str
 		.split(NOT_WORD_CHAR_NOR_UNDERSCORE)
-		.map((word, i) => (i === 0 ? word : convertToTitle(word)))
+		.map((word, i) => (i === 0 ? word.toLowerCase() : convertToTitle(word)))
 		.join('')
 	;
 }
 
 function convertToTitle (str) {
+	str = str.toLowerCase();
 	const upperFirstChar = str[0].toUpperCase();
 	return upperFirstChar + str.substr(1);
 }
